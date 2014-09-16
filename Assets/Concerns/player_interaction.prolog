@@ -58,7 +58,7 @@ strategy(engage_in_conversation(Person, _Topic),
 strategy(player_input(question(player, $me, Question, present, simple)),
 	 S) :-
    (Question = Answer:Constraint) ->
-      ( core_predication(Constraint, Core),
+      ( lf_main_predicate(Constraint, Core),
 	S=answer_wh(Answer, Core, Constraint)
       )
       ;
@@ -90,6 +90,7 @@ strategy(answer_wh(M, _, manner(be($me), M)),
 
 default_strategy(enumerate_answers(Answer, Core, Constraint),
 	 answer_with_list(List, Connective, Answer, Core)) :-
+   nonvar(Constraint),
    all(Answer, Constraint, List),
    connective_for_answer(Constraint, Connective).
 
@@ -105,33 +106,12 @@ strategy(answer_with_list([ ], _, Var, Constraint),
 strategy(answer_with_list(ItemList, Termination, Var, Constraint),
 	 say_list(ItemList, Termination, Var^s(Constraint))).
 
-core_predication((P, _), C) :-
-   !,
-   core_predication(P, C).
-core_predication(P,P).
-
 %%
 %% Hypnotic commands
 %%
 
 strategy(player_input(hypno_command(_, $me, LF, present, simple)),
 	 call(hypnotically_believe(LF))).
-
-:- public hypnotically_believe/1.
-hypnotically_believe(~LF) :-
-   !,
-   hypnotically_believable(LF, Assertion),
-   retract(Assertion).
-hypnotically_believe(LF) :-
-   hypnotically_believable(LF, Assertion),
-   assert(Assertion).
-
-hypnotically_believable(hungry,
-			/physiological_states/hungry).
-hypnotically_believable(thirsty,
-			/physiological_states/thirsty).
-hypnotically_believable(is_a(Thing, Kind),
-			/brainwash/Thing/kind/Kind).
 
 %%
 %% Question answering KB
