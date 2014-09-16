@@ -81,7 +81,10 @@ postcondition(drink(_, X),
 	      ~exists(X)).
 postcondition(drink(Person, B),
 	      ~thirsty(Person)) :-
-   is_a(B, beverage).
+   is_a(B, beverage),
+   component_of_gameobject_with_type(C, B, $'PhysicalObject'),
+   property(C, "enabled", true).
+
 
 self_achieving(/perception/nobody_speaking).
 

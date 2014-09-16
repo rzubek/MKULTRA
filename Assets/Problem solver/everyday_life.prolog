@@ -16,8 +16,28 @@ strategy(everyday_life,
 
 
 default_strategy(everyday_life,
-		 ( wait_event_with_timeout(_, 60),
+		 ( wait_event_with_timeout(_, 2),
+		   call(assert(/physiological_states/thirsty)),
 		   everyday_life )).
+
+%default_strategy(everyday_life,
+%		 ( wait_event_with_timeout(_, 2),
+%		   everyday_life )).
+
+%default_strategy(everyday_life,
+%		 ( wait_event_with_timeout(_, 2),
+%		   maybe_phys_state(B, thirsty),
+%		   everyday_life )) :-
+%	once(random_member(B, [true, false])).
+
+strategy(maybe_phys_state(B, State), 
+		 call(assert(/physiological_states/State))) :-
+	B = true.					% update if b is true
+
+strategy(maybe_phys_state(B, _), 
+		null) :-
+	B = false.					% don't do anything on false
+
 
 maintenance_goal(~hungry($me)).
 hungry($me) :- /physiological_states/hungry.
