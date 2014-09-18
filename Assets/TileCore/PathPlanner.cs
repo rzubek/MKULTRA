@@ -82,7 +82,7 @@ public class PathPlanner : BindingBehaviour
             {
                 float newDistanceFromStart = currentNode.DistanceFromStart                           // Cost so far
                                  + TilePosition.EuclideanDistance(currentNode.Position, n.Position)  // Edge cost
-                                 + TilePosition.EuclideanDistance(n.Position, end);                  // Estimated cost to end
+                                 + TilePosition.EuclideanDistance(n.Position, end) * 5;                  // Estimated cost to end
 
                 if (n.DistanceFromStart > newDistanceFromStart)
                 {
