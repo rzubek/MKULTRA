@@ -7,9 +7,9 @@
 
 :- indexical test_name=null, test_options=null, test_body=null, running_tests=false.
 
-running_tests :-
-   X = $running_tests,
-   X.
+%running_tests :-
+%   X = $running_tests,
+%   X.
 
 %% test(*Name, +Options)
 %  Body of this rule is a test that should be run with the specified options.

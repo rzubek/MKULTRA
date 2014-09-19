@@ -109,8 +109,8 @@ kind_glb(Kind1, Kind2, GLB) :-
 
 %% property_nondefault_value(?Object, ?Property, ?Value)
 %  Object has this property value explicitly declared, rather than inferred.
-property_nondefault_value(Object, Property, Value) :-
-   declare_value(Object, Property, Value).
+%property_nondefault_value(Object, Property, Value) :-
+%   declare_value(Object, Property, Value).
 
 %% property_value(?Object, ?Property, ?Value)
 %  Object has this value for this property.
@@ -131,9 +131,9 @@ lookup_property_value(Object, Property, Value) :-
 
 %% related_nondefault(?Object, ?Relation, ?Relatum)
 %  Object and Relatum are related by Relation through an explicit declaration.
-related_nondefault(Object, Relation, Relatum) :-
-   decendant_relation(D, Relation),
-   declare_related(Object, D, Relatum).
+%related_nondefault(Object, Relation, Relatum) :-
+%   decendant_relation(D, Relation),
+%   declare_related(Object, D, Relatum).
 
 %% related(?Object, ?Relation, ?Relatum)
 %  Object and Relatum are related by Relation.

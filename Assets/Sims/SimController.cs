@@ -82,7 +82,7 @@ public class SimController : PhysicalObject
     private CharacterSteeringController steering;
 
     [Bind(BindingScope.GameObject, BindingDefault.Ignore)]
-    private NLPrompt nlPrompt;
+    private object nlPrompt;
 
     [Bind(BindingScope.Global, BindingDefault.Create)]
     private PathPlanner planner;
@@ -553,9 +553,9 @@ public class SimController : PhysicalObject
                     if (talkingToPlayer)
                         // Character is talking to zhimself
                     {
-                        if (nlPrompt != null)
-                            nlPrompt.OutputToPlayer(textString);
-                        else
+                        // if (nlPrompt != null)
+                        //    nlPrompt.OutputToPlayer(textString);
+                        // else
                             this.Say(string.Format("({0})", textString));
                     }
                     else

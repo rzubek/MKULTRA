@@ -55,63 +55,63 @@ strategy(engage_in_conversation(Person, _Topic),
 %%
 
 % Dispatch on question type
-strategy(player_input(question(player, $me, Question, present, simple)),
-	 S) :-
-   (Question = Answer:Constraint) ->
-      ( lf_main_predicate(Constraint, Core),
-	S=answer_wh(Answer, Core, Constraint)
-      )
-      ;
-      (S=answer_yes_no(Question)).
+%strategy(player_input(question(player, $me, Question, present, simple)),
+%	 S) :-
+%   (Question = Answer:Constraint) ->
+%      ( lf_main_predicate(Constraint, Core),
+%	S=answer_wh(Answer, Core, Constraint)
+%      )
+%      ;
+%      (S=answer_yes_no(Question)).
 
 %% Yes/no quetsions
-strategy(answer_yes_no(Q),
-	 Answer) :-
-   Q -> (Answer = agree($me, $addressee, Q)) ; (Answer = disagree($me, $addressee, Q)).
+%strategy(answer_yes_no(Q),
+%	 Answer) :-
+%   Q -> (Answer = agree($me, $addressee, Q)) ; (Answer = disagree($me, $addressee, Q)).
 
 %% Wh-questions
 
-default_strategy(answer_wh(Answer, Core, Constraint),
-		 enumerate_answers(Answer, Core, Constraint)).
+%default_strategy(answer_wh(Answer, Core, Constraint),
+%		 enumerate_answers(Answer, Core, Constraint)).
 
-strategy(answer_wh(Identity, _, (be(Person, Identity), is_a(Person, person))),
-	 introduce_person(Person)) :-
-   character(Person).
+%strategy(answer_wh(Identity, _, (be(Person, Identity), is_a(Person, person))),
+%	 introduce_person(Person)) :-
+%   character(Person).
 
-strategy(answer_wh(Identity, _, (be(player, Identity), is_a(player, person))),
-	 say(be(player, $me))).
+%strategy(answer_wh(Identity, _, (be(player, Identity), is_a(player, person))),
+%	 say(be(player, $me))).
 
-strategy(answer_wh(Answer, can(Action), Constraint),
-	 answer_with_list(List, "or", Type, (can(Action), is_a(Answer, Type)))) :-
-   possible_types_given_constraint(Answer, Constraint, List).
+%strategy(answer_wh(Answer, can(Action), Constraint),
+%	 answer_with_list(List, "or", Type, (can(Action), is_a(Answer, Type)))) :-
+%   possible_types_given_constraint(Answer, Constraint, List).
 
-strategy(answer_wh(M, _, manner(be($me), M)),
-	 say(okay($me))).
+%strategy(answer_wh(M, _, manner(be($me), M)),
+%	 say(okay($me))).
 
-default_strategy(enumerate_answers(Answer, Core, Constraint),
-	 answer_with_list(List, Connective, Answer, Core)) :-
-   nonvar(Constraint),
-   all(Answer, Constraint, List),
-   connective_for_answer(Constraint, Connective).
+%default_strategy(enumerate_answers(Answer, Core, Constraint),
+%	 answer_with_list(List, Connective, Answer, Core)) :-
+%   nonvar(Constraint),
+%   all(Answer, Constraint, List),
+%   connective_for_answer(Constraint, Connective).
 
-connective_for_answer((can(_), _), "or") :- !.
-connective_for_answer(_, "and").
+%connective_for_answer((can(_), _), "or") :- !.
+%connective_for_answer(_, "and").
 
-strategy(answer_with_list([ ], _, Var, Constraint),
-	 say_string(S)) :-
-   !,
-   begin(variable_type_given_constraint(Var, Constraint, Kind)),
-   (kind_of(Kind, actor) -> S="Nobody"; S="Nothing").
+%strategy(answer_with_list([ ], _, Var, Constraint),
+%	 say_string(S)) :-
+%   !,
+%   begin(variable_type_given_constraint(Var, Constraint, Kind)),
+%   (kind_of(Kind, actor) -> S="Nobody"; S="Nothing").
 
-strategy(answer_with_list(ItemList, Termination, Var, Constraint),
-	 say_list(ItemList, Termination, Var^s(Constraint))).
+%strategy(answer_with_list(ItemList, Termination, Var, Constraint),
+%	 say_list(ItemList, Termination, Var^s(Constraint))).
 
 %%
 %% Hypnotic commands
 %%
 
-strategy(player_input(hypno_command(_, $me, LF, present, simple)),
-	 call(hypnotically_believe(LF))).
+%strategy(player_input(hypno_command(_, $me, LF, present, simple)),
+%	 call(hypnotically_believe(LF))).
 
 %%
 %% Question answering KB
