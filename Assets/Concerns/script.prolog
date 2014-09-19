@@ -11,7 +11,6 @@ on_event(Event, script, C, script_update(C, Event)) :-
    Event = AwaitedEvent.
    
 propose_action(Action, script, C) :-
-   /perception/nobody_speaking,
    C/awaiting/Action,
    action(Action),
    agent(Action, $me).

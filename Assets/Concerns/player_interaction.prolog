@@ -22,14 +22,14 @@ default_strategy(player_input(_),
 %% Imperatives
 %%
 
-strategy(player_input(command(player, $me, LF)),
-	 follow_command(LF, Morality)) :-
-   (@immoral(LF)) -> (Morality = immoral) ; (Morality = moral).
-strategy(follow_command(LF, moral),
-	 ( assertion($me, $addressee, LF, future, simple),
-	   LF )).
-strategy(follow_command(_, immoral),
-	 say_string("That would be immoral.")).
+%strategy(player_input(command(player, $me, LF)),
+%	 follow_command(LF, Morality)) :-
+%   (@immoral(LF)) -> (Morality = immoral) ; (Morality = moral).
+%strategy(follow_command(LF, moral),
+%	 ( assertion($me, $addressee, LF, future, simple),
+%	   LF )).
+%strategy(follow_command(_, immoral),
+%	 say_string("That would be immoral.")).
 
 strategy(go($me, Location),
 	 goto(Location)).

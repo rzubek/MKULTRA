@@ -8,12 +8,10 @@ using UnityEngine;
  * 
  * /perception/conversational_space/*
  * /perception/social_space/*
- * /perception/nobody_speaking
  * /perception/docked_with:OBJECT
  * 
  * /motor_root/walking_to:Destination
  * /motor_root/last_action:Action
- * /motor_root/i_am_speaking
  * 
  * /event_history/*
  */
@@ -65,17 +63,6 @@ public class SimController : PhysicalObject
     /// </summary>
     public bool LogActions;
 
-    /// <summary>
-    /// Is this character currently talking?
-    /// </summary>
-    public bool IsSpeaking
-    {
-        get
-        {
-            return currentSpeechBubbleText != null;
-        }
-    }
-
     #region Bindings to other components
 #pragma warning disable 649
     [Bind]
@@ -115,17 +102,6 @@ public class SimController : PhysicalObject
     private Room myCurrentRoom;
 
     readonly Queue<Structure> eventQueue = new Queue<Structure>();
-
-    /// <summary>
-    /// Holds the current text for the character's speech bubble.
-    /// Set to null is no active text.
-    /// </summary>
-    string currentSpeechBubbleText;
-
-    /// <summary>
-    /// Time at which currentSpeechBubbleText should be set to null.
-    /// </summary>
-    private float clearSpeechTime;
 
     /// <summary>
     /// Current path being followed if the character is moving.  Null if no current locomotion goal.
@@ -278,8 +254,6 @@ public class SimController : PhysicalObject
     {
         if (!PauseManager.Paused)
         {
-            this.UpdateSpeechBubble();
-
             this.UpdateLocomotion();
 
             this.UpdateLocations();
@@ -289,15 +263,15 @@ public class SimController : PhysicalObject
                 ConversationalSpaceRadius,
                 conversationalSpace,
                 "enter_conversational_space",
-                "exit_conversational_space",
-                true);
+                "exit_conversational_space"
+                );
             this.UpdateSpace(
                 socialSpaceColliders,
                 SocialSpaceRadius,
                 socialSpace,
                 "enter_social_space",
-                "exit_social_space",
-                false);
+                "exit_social_space"
+                );
 
             this.EnsureCharacterInitialized();
 
@@ -317,14 +291,11 @@ public class SimController : PhysicalObject
     readonly Collider2D[] conversationalSpaceColliders = new Collider2D[MaxConversationalSpaceColliders];
     readonly Collider2D[] socialSpaceColliders = new Collider2D[MaxConversationalSpaceColliders];
 
-    // ReSharper disable once InconsistentNaming
-    private readonly Symbol SNobodySpeaking = Symbol.Intern("nobody_speaking");
-    
     /// <summary>
     /// Update the set of character's within this characters' conversational space
     /// and generate any necessary enter/leave events.
     /// </summary>
-    private void UpdateSpace(Collider2D[] colliders, float radius, ELNode statusNode, string enterEvent, string exitEvent, bool updateNobodySpeaking)
+    private void UpdateSpace(Collider2D[] colliders, float radius, ELNode statusNode, string enterEvent, string exitEvent)
     {
         var characterCount = Physics2D.OverlapCircleNonAlloc(
             transform.position,
@@ -367,23 +338,6 @@ public class SimController : PhysicalObject
             }
         }
 
-        if (updateNobodySpeaking)
-        {
-            bool nobodySpeaking = true;
-            for (var i = 0; i<characterCount; i++)
-                if (colliders[i].GetComponent<SimController>().IsSpeaking)
-                    nobodySpeaking = false;
-            if (nobodySpeaking)
-                ELNode.Store(perceptionRoot/SNobodySpeaking);
-            else
-            {
-                if (perceptionRoot.ContainsKey(SNobodySpeaking))
-                {
-                    perceptionRoot.DeleteKey(SNobodySpeaking);
-                    pollActions = true;
-                }
-            }
-        }
     }
 
     private void UpdateLocations()
@@ -466,11 +420,6 @@ public class SimController : PhysicalObject
                     this.Face(structure.Argument<GameObject>(0));
                     break;
 
-                case "say":
-                    // Say a fixed string
-                    this.Say(structure.Argument<string>(0));
-                    break;
-
                 case "cons":
                     // It's a list of actions to initiate.
                     this.InitiateAction(structure.Argument(0));
@@ -528,50 +477,9 @@ public class SimController : PhysicalObject
                     break;
                 }
 
-
-
-
-                default:
-                    // Assume it's dialog
-                    var textVar = new LogicVariable("DialogText");
-                    object text = null;
-                    try
-                    {
-                        text = gameObject.SolveFor(textVar, "generate_text", structure, textVar);
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.LogError(string.Format("Exception while generating text for {0}", gameObject.name));
-                        Debug.LogException(e);
-                    }
-                    var textString = text as string;
-                    if (textString == null)
-                        throw new Exception(
-                            "generate_text returned " + ISOPrologWriter.WriteToString(text) + " for "
-                            + ISOPrologWriter.WriteToString(structure));
-                    var talkingToPlayer = structure.Arity >= 2 && ReferenceEquals(structure.Argument(1), playerSymbol);
-                    if (talkingToPlayer)
-                        // Character is talking to zhimself
-                    {
-                        // if (nlPrompt != null)
-                        //    nlPrompt.OutputToPlayer(textString);
-                        // else
-                            this.Say(string.Format("({0})", textString));
-                    }
-                    else
-                        this.Say(textString);
-
-                    if (!talkingToPlayer)
-                    {
-                        // Tell the other characters
-                        foreach (var node in this.socialSpace.Children)
-                        {
-                            var character = (GameObject)(node.Key);
-                            if (character != this.gameObject)
-                                character.QueueEvent((Structure)Term.CopyInstantiation(structure));
-                        }
-                    }
-                    break;
+                default: 
+                    throw new NotImplementedException(structure.Functor.Name);
+                
             }
             if (structure.Functor.Name != "sleep")
                 // Report back to the character that the action has occurred.
@@ -579,16 +487,6 @@ public class SimController : PhysicalObject
         }
         else
             throw new InvalidOperationException("Unknown action: " + ISOPrologWriter.WriteToString(action));
-    }
-
-    private void UpdateSpeechBubble()
-    {
-        // Clear speech bubble if it's time.
-        if (this.currentSpeechBubbleText != null && Time.time > this.clearSpeechTime)
-        {
-            this.currentSpeechBubbleText = null;
-            this.motorRoot.DeleteKey(SIAmSpeaking);
-        }
     }
 
     /// <summary>
@@ -600,23 +498,6 @@ public class SimController : PhysicalObject
         steering.Face(target.Position() - (Vector2)transform.position);
     }
 
-    /// <summary>
-    /// Displays the specified string.
-    /// </summary>
-    /// <param name="speech">String to display</param>
-    public void Say(string speech)
-    {
-        this.currentSpeechBubbleText = speech;
-        ELNode.Store(motorRoot / SIAmSpeaking);
-        clearSpeechTime = Time.time +
-            Math.Max(
-                SpeechDelayMinimum,
-                Math.Min(SpeechDelayMaximum,
-                         speech.Length * SpeechDelaySecondsPerChar));
-    }
-
-    // ReSharper disable once InconsistentNaming
-    private static readonly Symbol SIAmSpeaking = Symbol.Intern("i_am_speaking");
     #endregion
 
     #region Locomotion control
@@ -712,19 +593,6 @@ public class SimController : PhysicalObject
                         bidTotals[destination] = bidValue;
                 }
             }
-        }
-    }
-    #endregion
-
-    #region Speech bubbles
-    public GUIStyle SpeechBubbleStyle;
-
-    internal void OnGUI()
-    {
-        if (Camera.current != null && !string.IsNullOrEmpty(this.currentSpeechBubbleText))
-        {
-            var bubblelocation = (Vector2)Camera.current.WorldToScreenPoint(transform.position);
-            GUI.Label(new Rect(bubblelocation.x, Camera.current.pixelHeight-bubblelocation.y, 300, 300), this.currentSpeechBubbleText, SpeechBubbleStyle);
         }
     }
     #endregion
