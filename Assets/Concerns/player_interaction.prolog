@@ -2,21 +2,21 @@
 %%% Driver for conversation between player and player character
 %%%
 
-on_event(player_input(X),
-	 player_interaction,
-	 C,
-	 player_input_task(C, player_input(X))).
+%on_event(player_input(X),
+%	 player_interaction,
+%	 C,
+%	 player_input_task(C, player_input(X))).
 
-player_input_task(Concern, Input) :-
-   kill_children(Concern),
-   start_task(Concern, Input, 100, T, [T/partner/player]).
+%player_input_task(Concern, Input) :-
+%   kill_children(Concern),
+%   start_task(Concern, Input, 100, T, [T/partner/player]).
 
 %%
 %% Uninterpretable inputs
 %%
 
-default_strategy(player_input(_),
-		 do_not_understand($me, player)).
+%default_strategy(player_input(_),
+%		 do_not_understand($me, player)).
 
 %%
 %% Imperatives
@@ -31,24 +31,24 @@ default_strategy(player_input(_),
 %strategy(follow_command(_, immoral),
 %	 say_string("That would be immoral.")).
 
-strategy(go($me, Location),
-	 goto(Location)).
-strategy(take($me, Patient, _),
-	 pickup(Patient)).
-strategy(put($me, Patient, Destination),
-	 move($me, Patient, Destination)) :-
-   nonvar(Destination).
+%strategy(go($me, Location),
+%	 goto(Location)).
+%strategy(take($me, Patient, _),
+%	 pickup(Patient)).
+%strategy(put($me, Patient, Destination),
+%	 move($me, Patient, Destination)) :-
+%   nonvar(Destination).
 
-strategy(talk($me, $addressee, Topic),
-	 describe(Topic, introduction)) :-
-   nonvar(Topic).
+%strategy(talk($me, $addressee, Topic),
+%	 describe(Topic, introduction)) :-
+%   nonvar(Topic).
 
-strategy(talk($me, ConversationalPartner, Topic),
-	 engage_in_conversation(ConversationalPartner, Topic)) :-
-   ConversationalPartner \= $addressee.
+%strategy(talk($me, ConversationalPartner, Topic),
+%	 engage_in_conversation(ConversationalPartner, Topic)) :-
+%   ConversationalPartner \= $addressee.
 
-strategy(engage_in_conversation(Person, _Topic),
-	 ( goto(Person), greet($me, Person) )).
+%strategy(engage_in_conversation(Person, _Topic),
+%	 ( goto(Person), greet($me, Person) )).
 
 %%
 %% Questions

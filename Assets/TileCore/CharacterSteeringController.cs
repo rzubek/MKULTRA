@@ -79,65 +79,12 @@ public class CharacterSteeringController : BindingBehaviour
         return offset * MaxForce / distanceToTarget;
     }
 
-    //private float collisionTime;
-    //private bool collisionDetected;
-    Vector2? CollisionAvoidanceSteering()
-    {
-        return null;
-        //float firstCollisionTime = 4;
-        //Vector2 firstCollisionOffset = Vector2.zero;
-        //foreach (var otherCharacter in Registry<CharacterSteeringController>())
-        //{
-        //    if (otherCharacter != this)
-        //    {
-        //        var time = TimeOfClosestApproach(this, otherCharacter);
-        //        //collisionTime = time;
-        //        if (time > 0 && time < firstCollisionTime)
-        //        {
-        //            var myPosition = PredictedPosition(this, time);
-        //            var theirPosition = this.PredictedPosition(otherCharacter, time);
-        //            var offset = myPosition - theirPosition;
-        //            if (offset.magnitude < 1.5)
-        //            {
-        //                firstCollisionTime = time;
-        //                firstCollisionOffset = offset;
-        //            }
-        //        }
-        //    }
-        //}
-
-        ////collisionDetected = false;
-        //if (firstCollisionTime > 3)
-        //    return null;
-
-        ////collisionDetected = true;
-        //if (this.rigidbody2D.velocity == Vector2.zero)
-        //{
-        //    return firstCollisionOffset.normalized.PerpCounterClockwise();
-        //}
-        //var separation = firstCollisionOffset.magnitude;
-        //var escapeDirection = firstCollisionOffset / separation;
-        //if (separation < 2)
-        //    escapeDirection += escapeDirection.PerpClockwise().normalized;
-
-        //return 0.5f * this.MaxForce * escapeDirection;
-    }
 
     private Vector2 PredictedPosition(Component sprite, float time)
     {
         return (Vector2)sprite.transform.position + time * sprite.rigidbody2D.velocity;
     }
 
-    /// <summary>
-    /// Computes the time of closest approach for the two characters, given their velocities
-    /// Note: time could be negative (i.e. in the past)
-    /// </summary>
-    private float TimeOfClosestApproach(Component c1, Component c2)
-    {
-        var i = (Vector2)c1.transform.position - (Vector2)c2.transform.position;
-        var deltaV = c1.rigidbody2D.velocity - c2.rigidbody2D.velocity;
-        return -Vector2.Dot(i, deltaV) / deltaV.sqrMagnitude;
-    }
 
     /// <summary>
     /// Connection to physics system.
@@ -148,7 +95,6 @@ public class CharacterSteeringController : BindingBehaviour
     public void FixedUpdate()
     {
         var seekSteering = this.SeekSteering();
-        var collisionAvoidanceSteering = this.CollisionAvoidanceSteering();
 
         //var force = this.MaybeAdd(seekSteering, collisionAvoidanceSteering);
         var force = seekSteering;
@@ -175,20 +121,11 @@ public class CharacterSteeringController : BindingBehaviour
         }
 
         BlueVector = seekSteering * 0.1f;
-        RedVector = collisionAvoidanceSteering.HasValue ? (collisionAvoidanceSteering.Value * 0.1f) : Vector2.zero;
         GreenVector = force*0.1f;
 
         rb.AddForce(force);
-        if (collisionAvoidanceSteering.HasValue)
-            rb.AddForce(collisionAvoidanceSteering.Value);
     }
 
-    Vector2 MaybeAdd(Vector2 v1, Vector2? v2)
-    {
-        if (v2 == null)
-            return v1;
-        return v1 + v2.Value;
-    }
     #endregion
 
     #region Animation control

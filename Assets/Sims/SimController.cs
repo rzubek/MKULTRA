@@ -6,8 +6,6 @@ using UnityEngine;
 /*
  * WORKING MEMORY INTERFACE
  * 
- * /perception/conversational_space/*
- * /perception/social_space/*
  * /perception/docked_with:OBJECT
  * 
  * /motor_root/walking_to:Destination
@@ -36,10 +34,6 @@ public class SimController : PhysicalObject
     public string Type="woman";
     #endregion
 
-    #region Constants
-
-    private readonly Symbol playerSymbol = Symbol.Intern("player");
-    #endregion
 
     /// <summary>
     /// Whether to log actions as they're taken.
@@ -70,8 +64,6 @@ public class SimController : PhysicalObject
 
     private ELNode locationRoot;
 
-    private ELNode conversationalSpace;
-
     private ELNode socialSpace;
 
     private ELNode lastDestination;
@@ -82,8 +74,6 @@ public class SimController : PhysicalObject
 
     private ELNode physiologicalStates;
 
-    private Room myCurrentRoom;
-
     readonly Queue<Structure> eventQueue = new Queue<Structure>();
 
     /// <summary>
@@ -92,6 +82,7 @@ public class SimController : PhysicalObject
     private TilePath currentPath;
 
     private GameObject currentDestination;
+    private GameObject currentlyDockedWith;
 
     /// <summary>
     /// Object being locomoted to, if any.
@@ -108,19 +99,33 @@ public class SimController : PhysicalObject
         set
         {
             this.currentDestination = value;
-            if (currentDestination == null)
-            {
+            if (currentDestination == null) {
                 motorRoot.DeleteKey(SWalkingTo);
+            } else {
+                ELNode.Store(motorRoot / SWalkingTo % CurrentDestination);
+                ELNode.Store(lastDestination % CurrentDestination);
             }
-            else
-                ELNode.Store(motorRoot/SWalkingTo%CurrentDestination);
         }
     }
 
     /// <summary>
     /// Object with which we're currently docked.
     /// </summary>
-    public GameObject CurrentlyDockedWith { get; private set; }
+    public GameObject CurrentlyDockedWith { 
+        get
+        {
+            return this.currentlyDockedWith;
+        }
+        set
+        {
+            this.currentlyDockedWith = value;
+            if (currentlyDockedWith == null) {
+                perceptionRoot.DeleteKey(SDockedWith);
+            } else {
+                ELNode.Store(perceptionRoot / SDockedWith % CurrentlyDockedWith);
+            }
+        }
+    }
 
     /// <summary>
     /// Time to wake character up and ask for an action.
@@ -203,8 +208,6 @@ public class SimController : PhysicalObject
         elRoot = this.KnowledgeBase().ELRoot;
         this.perceptionRoot = elRoot / Symbol.Intern("perception");
         this.locationRoot = perceptionRoot / Symbol.Intern("location");
-        this.conversationalSpace = perceptionRoot / Symbol.Intern("conversational_space");
-        this.socialSpace = perceptionRoot / Symbol.Intern("social_space");
         this.motorRoot = elRoot / Symbol.Intern("motor_state");
         this.physiologicalStates = elRoot / Symbol.Intern("physiological_states");
         this.eventHistory = elRoot / Symbol.Intern("event_history");
@@ -273,8 +276,6 @@ public class SimController : PhysicalObject
                         if (r.Contains(o))
                         {
                             ELNode.Store(locationRoot / o % (r.gameObject));
-                            if (o == gameObject)
-                                myCurrentRoom = r;
                         }
                 }
             }
@@ -426,7 +427,6 @@ public class SimController : PhysicalObject
         if (CurrentlyDockedWith != null && !CurrentlyDockedWith.DockingTiles().Contains(this.transform.position))
         {
             // We were docked with an object, but are not anymore.
-            perceptionRoot.DeleteKey(SDockedWith);
             CurrentlyDockedWith = null;
         }
 
@@ -437,18 +437,19 @@ public class SimController : PhysicalObject
                 || (Vector2.Distance(this.transform.position, currentDestination.transform.position) < 0.75
                      && currentDestination.IsCharacter()))
             {
-                // Finished the path
-                this.CurrentlyDockedWith = CurrentDestination;
-                ELNode.Store(perceptionRoot/SDockedWith%CurrentlyDockedWith);
-                ELNode.Store(lastDestination % this.CurrentDestination);
-                this.currentPath = null;
-                this.currentDestination = null;
-                (motorRoot / SWalkingTo).DeleteSelf();
-                this.Face(CurrentlyDockedWith);
-                this.steering.Stop();
-                this.QueueEvent("arrived_at", this.CurrentlyDockedWith);
+                OnPathSuccessful();
             }
         }
+    }
+
+    private void OnPathSuccessful () {
+        // Finished the path
+        this.CurrentlyDockedWith = CurrentDestination;
+        this.CurrentDestination = null;
+        this.QueueEvent("arrived_at", this.CurrentlyDockedWith);
+        this.Face(CurrentlyDockedWith);
+        this.steering.Stop();
+        this.currentPath = null;
     }
 
     readonly Dictionary<GameObject, float> bidTotals = new Dictionary<GameObject, float>();
@@ -476,8 +477,7 @@ public class SimController : PhysicalObject
         {
             // Replan if destination has changed or if destination has moved away from current path.
             var newDestination = (winner != CurrentDestination && winner != CurrentlyDockedWith);
-            if (newDestination
-                || (currentDestination != null && currentPath != null && !CurrentDestination.DockingTiles().Contains(currentPath.FinalTile)))
+            if (newDestination)
             {
                 if (newDestination)
                     ELNode.Store(eventHistory / new Structure("goto", winner)); // Log change for debugging purposes.

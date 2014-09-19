@@ -9013,6 +9013,7 @@ GameObject:
   - 114: {fileID: 1233353666}
   - 114: {fileID: 1233353665}
   - 114: {fileID: 1233353664}
+  - 114: {fileID: 1233353663}
   m_Layer: 9
   m_Name: Bruce
   m_TagString: Bruce
@@ -9032,6 +9033,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 167612177}
   m_RootOrder: 0
+--- !u!114 &1233353663
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 11400010, guid: e9684a2a4728ecf468032a6abc10019a,
+    type: 2}
+  m_PrefabInternal: {fileID: 744372268}
+  m_GameObject: {fileID: 1233353661}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34c5496f1c8788e4b9c742e25fe97b51, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DockingRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
 --- !u!114 &1233353664
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10285,7 +10304,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Map: {fileID: 0}
-  DisplayOverlays: 1
 --- !u!1 &1411697433
 GameObject:
   m_ObjectHideFlags: 0
@@ -11004,6 +11022,7 @@ GameObject:
   - 114: {fileID: 1477001994}
   - 114: {fileID: 1477001993}
   - 114: {fileID: 1477001992}
+  - 114: {fileID: 1477001996}
   m_Layer: 9
   m_Name: Kavi
   m_TagString: Kavi
@@ -11148,6 +11167,24 @@ MonoBehaviour:
   LogActions: 0
   DecisionCycleCount: 0
   DecisionCycleAlloc: 0
+--- !u!114 &1477001996
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 11400010, guid: 27174ad68769dde4c816618c0225638e,
+    type: 2}
+  m_PrefabInternal: {fileID: 1089531897}
+  m_GameObject: {fileID: 1477001990}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34c5496f1c8788e4b9c742e25fe97b51, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DockingRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
 --- !u!114 &1477001997
 MonoBehaviour:
   m_ObjectHideFlags: 0
