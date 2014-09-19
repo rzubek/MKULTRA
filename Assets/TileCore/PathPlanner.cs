@@ -18,40 +18,13 @@ public class PathPlanner : BindingBehaviour
     private TileHeap heap;
 
     /// <summary>
-    /// Visualization of the tiles that were searched during planning.
-    /// Used for debugging.
-    /// </summary>
-    private readonly TileSetOverlay searchedTilesOverlay = new TileSetOverlay(new Color(1,1,0,0.3f));
-    /// <summary>
-    /// Visualization of the computed path.
-    /// Used for debugging.
-    /// </summary>
-    private readonly TileSetOverlay computedPathOverlay = new TileSetOverlay(new Color(0,1,0, 0.4f));
-
-    public bool DisplayOverlays;
-
-    /// <summary>
     /// Called by Unity when the PathPlanner object is created.
     /// </summary>
     public void Start()
     {
         heap = new TileHeap(Map);
-        this.UpdateOverlayVisibility();
     }
 
-    private void UpdateOverlayVisibility()
-    {
-        if (DisplayOverlays)
-        {
-            this.Map.AddOverlay(this.searchedTilesOverlay);
-            this.Map.AddOverlay(this.computedPathOverlay);
-        }
-        else
-        {
-            this.Map.RemoveOverlay(this.searchedTilesOverlay);
-            this.Map.RemoveOverlay(this.computedPathOverlay);
-        }
-    }
 
     /// <summary>
     /// Find the shortest path between the specified tiles.
@@ -70,14 +43,13 @@ public class PathPlanner : BindingBehaviour
     public TilePath Plan(TilePosition start, TileRect end)
     {
         heap.Clear();
-        searchedTilesOverlay.Clear();
         var startNode = heap.NodeAt(start);
         startNode.Predecessor = null;
         heap.DecreaseKey(startNode, 0, 0);
         var currentNode = startNode;
+
         while (!heap.IsEmpty && !end.Contains((currentNode = heap.ExtractMin()).Position))
         {
-            searchedTilesOverlay.Add(currentNode.Position);
             foreach (var n in currentNode.Neighbors)
             {
                 float newDistanceFromStart = currentNode.DistanceFromStart                           // Cost so far
@@ -91,10 +63,6 @@ public class PathPlanner : BindingBehaviour
                 }
             }
         }
-        heap.SetOverlayToComputedPath(this.computedPathOverlay, currentNode);
-
-        searchedTilesOverlay.Clear();
-        searchedTilesOverlay.SetRect(end);
 
         if (!end.Contains(currentNode.Position))
             return null;

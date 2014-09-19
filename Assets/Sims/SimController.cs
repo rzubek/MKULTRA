@@ -37,23 +37,6 @@ public class SimController : PhysicalObject
     #endregion
 
     #region Constants
-    /// <summary>
-    /// The radius of the the circular region around the character that defines
-    /// its "conversational space".  Two characters having a conversation should
-    /// normally be within one anothers' conversational spaces.
-    /// </summary>
-    private const float ConversationalSpaceRadius = 2;
-    private const float SocialSpaceRadius = 4;
-
-    /// <summary>
-    /// Maximum number of characters that can be within a character's conversational space.
-    /// </summary>
-    private const int MaxConversationalSpaceColliders = 30;
-
-    private const float SpeechDelaySecondsPerChar = 0.075f;
-
-    private const float SpeechDelayMinimum = 1f;
-    private const float SpeechDelayMaximum = 4f;
 
     private readonly Symbol playerSymbol = Symbol.Intern("player");
     #endregion
@@ -258,21 +241,6 @@ public class SimController : PhysicalObject
 
             this.UpdateLocations();
 
-            this.UpdateSpace(
-                conversationalSpaceColliders,
-                ConversationalSpaceRadius,
-                conversationalSpace,
-                "enter_conversational_space",
-                "exit_conversational_space"
-                );
-            this.UpdateSpace(
-                socialSpaceColliders,
-                SocialSpaceRadius,
-                socialSpace,
-                "enter_social_space",
-                "exit_social_space"
-                );
-
             this.EnsureCharacterInitialized();
 
             this.HandleEvents();
@@ -288,57 +256,6 @@ public class SimController : PhysicalObject
     #endregion
 
     #region Perception update
-    readonly Collider2D[] conversationalSpaceColliders = new Collider2D[MaxConversationalSpaceColliders];
-    readonly Collider2D[] socialSpaceColliders = new Collider2D[MaxConversationalSpaceColliders];
-
-    /// <summary>
-    /// Update the set of character's within this characters' conversational space
-    /// and generate any necessary enter/leave events.
-    /// </summary>
-    private void UpdateSpace(Collider2D[] colliders, float radius, ELNode statusNode, string enterEvent, string exitEvent)
-    {
-        var characterCount = Physics2D.OverlapCircleNonAlloc(
-            transform.position,
-            radius,
-            colliders,
-            1 << gameObject.layer);
-        if (characterCount==MaxConversationalSpaceColliders)
-            throw new Exception("Too many colliders in conversational space!");
-
-        // Clean out entries that are no longer in the area
-        statusNode.DeleteAll(
-            node =>
-            {
-                // Look to see if node's key (a character) appears in the colliders
-                for (var i = 0; i<characterCount;i++)
-                    if (ReferenceEquals(node.Key, colliders[i].gameObject))
-                        return false;
-                // It doesn't, so the character left this character's conversational space.
-
-                // Tell this character about it
-                QueueEvent(exitEvent, node.Key);
-
-                // Remove the character
-                return true;
-            });
-
-        // Add new entries
-        for (var i = 0; i<characterCount;i++)
-        {
-            var character = colliders[i].gameObject;
-            if (character != gameObject && !statusNode.ContainsKey(character) && myCurrentRoom.Contains(character))
-            {
-                // The character just arrived in this character's conversational space
-
-                // Tell this character
-                QueueEvent(enterEvent, character);
-
-                // Update the KB
-                ELNode.Store(statusNode/character);
-            }
-        }
-
-    }
 
     private void UpdateLocations()
     {

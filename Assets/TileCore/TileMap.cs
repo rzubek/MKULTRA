@@ -96,11 +96,6 @@ public class TileMap : BindingBehaviour
         return sprite.GetComponent<Rigidbody2D>() == null;
     }
 
-    internal void Start()
-    {
-        StartCoroutine(this.MakeWalls());
-    }
-
     // ReSharper disable ParameterTypeCanBeEnumerable.Local
     private void PopulateMap(SpriteRenderer[] allSprites)
         // ReSharper restore ParameterTypeCanBeEnumerable.Local
@@ -161,161 +156,14 @@ public class TileMap : BindingBehaviour
     #endregion
 
     #region Contents tracking
-    public Tile[,] GetRegionTiles(TileRect r)
-    {
-        var tiles = new Tile[r.Width, r.Height];
-        foreach (var p in r)
-            tiles[p.Column - r.CMin, p.Row - r.RMin] = contents[p.Column, p.Row];
-        return tiles;
-    }
 
     public bool IsFreespace(TilePosition p)
     {
         if (p.Column < 0 || p.Row < 0 || p.Column >= MapColumns || p.Row >= MapRows)
             return false;
-        return contents[p.Column, p.Row].Type == TileType.Freespace;
-    }
-
-    public bool IsFreespace(TileRect r)
-    {
-        foreach (var p in r)
-            if (!IsFreespace(p))
-                return false;
         return true;
     }
     #endregion
 
-    #region Map overlays (for debugging visualization)
 
-    private Material overlayMaterial;
-    public void OnRenderObject()
-    {
-        if (this.overlayMaterial == null)
-            this.overlayMaterial = new Material(Shader.Find("GUI/Text Shader"));
-
-        this.overlayMaterial.SetPass(0);
-        GL.PushMatrix();
-        GL.MultMatrix(transform.localToWorldMatrix);
-
-        foreach (var overlay in overlays)
-            overlay.Draw(this);
-
-        GL.PopMatrix();
-    }
-
-    /// <summary>
-    /// Overlays to display on top of the map.
-    /// </summary>
-    private readonly HashSet<MapOverlay> overlays = new HashSet<MapOverlay>();
-
-    /// <summary>
-    /// Adds an overlay to display on top of the map.
-    /// Has no effect if the overlay is already being displayed.
-    /// </summary>
-    /// <param name="overlay">Overlay to display.</param>
-    public void AddOverlay(MapOverlay overlay)
-    {
-        if (!overlays.Contains(overlay))
-            overlays.Add(overlay);
-    }
-
-    /// <summary>
-    /// Disables display of the overlay.
-    /// </summary>
-    /// <param name="overlay">Overlay to disable.</param>
-    public void RemoveOverlay(MapOverlay overlay)
-    {
-        overlays.Remove(overlay);
-    }
-
-    /// <summary>
-    /// Cancels display of all overlays
-    /// </summary>
-    public void RemoveAllOverlays()
-    {
-        overlays.Clear();
-    }
-    #endregion
-
-    #region Collider generation
-    HashSet<TilePosition> WallTiles
-    {
-        get
-        {
-            var walls = new HashSet<TilePosition>();
-            foreach (var p in this.TilePositions())
-            {
-                if (this[p].Type == TileType.Wall)
-                    walls.Add(p);
-            }
-            return walls;
-        }
-    }
-
-    IEnumerator MakeWalls()
-    {
-        var walls = GameObject.Find("Map/Walls");
-        var remainingWallTiles = WallTiles;
-
-#if DEBUG_MAKEWALLS
-        var allWallsOverlay = new TileSetOverlay(Color.green);
-        var currentWallOverlay = new TileSetOverlay(Color.yellow);
-        this.AddOverlay(allWallsOverlay);
-        this.AddOverlay(currentWallOverlay);
-        allWallsOverlay.Set(remainingWallTiles);
-        yield return new WaitForSeconds(1);
-#endif
-
-        while (remainingWallTiles.Count > 0)
-        {
-            var seed = remainingWallTiles.First();
-            var vwall = this.ScanVertically(seed, remainingWallTiles);
-            var hwall = this.ScanHorizontally(seed, remainingWallTiles);
-            var selectedWall = vwall.Area > hwall.Area ? vwall : hwall;
-            foreach (var p in selectedWall)
-                remainingWallTiles.Remove(p);
-
-            var bcollider = walls.AddComponent<BoxCollider2D>();
-            bcollider.center = selectedWall.WorldCenter;
-            bcollider.size = selectedWall.Size;
-
-#if DEBUG_MAKEWALLS
-            allWallsOverlay.Clear();
-            allWallsOverlay.Set(remainingWallTiles);
-            currentWallOverlay.Clear();
-            currentWallOverlay.Set(selectedWall);
-            yield return new WaitForSeconds(2.0f);
-#endif
-        }
-        yield break;
-    }
-
-    TileRect ScanVertically(TilePosition seed, HashSet<TilePosition> wallTiles)
-    {
-        var col = seed.Column;
-        var top = seed.Row;
-        while (++top < MapRows && wallTiles.Contains(new TilePosition(col, top))) { }
-        top--;
-
-        var bottom = seed.Row;
-        while (--bottom >= 0 && wallTiles.Contains(new TilePosition(col, bottom))) { }
-        bottom++;
-
-        return new TileRect(new TilePosition(col, top), new TilePosition(col, bottom));
-    }
-
-    TileRect ScanHorizontally(TilePosition seed, HashSet<TilePosition> wallTiles)
-    {
-        var row = seed.Row;
-        var right = seed.Column;
-        while (++right < MapColumns && wallTiles.Contains(new TilePosition(right, row))) { }
-        right--;
-
-        var left = seed.Column;
-        while (--left >= 0 && wallTiles.Contains(new TilePosition(left, row))) { }
-        left++;
-
-        return new TileRect(new TilePosition(left, row), new TilePosition(right, row));
-    }
-    #endregion
 }
