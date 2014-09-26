@@ -492,11 +492,4 @@ public class SimController : PhysicalObject
     }
     #endregion
 
-    #region PhysicalObject methods
-    public override void Destroy()
-    {
-        base.Destroy();
-    }
-
-    #endregion
 }
