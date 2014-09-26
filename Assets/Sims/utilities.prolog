@@ -95,10 +95,10 @@ alive(X) :- is_a(X, person), exists(X).
 %  The character is currently docked with GameObject or its top-level container.
 docked_with(WorldObject) :-
    /perception/docked_with:WorldObject.
-docked_with(WorldObject) :-
-   top_level_container(WorldObject, Container),
-   WorldObject \= Container,
-   docked_with(Container).
+%docked_with(WorldObject) :-
+%   top_level_container(WorldObject, Container),
+%   WorldObject \= Container,
+%   docked_with(Container).
 
 %% after_time(+Time)
 %  The current time is after Time.

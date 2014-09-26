@@ -8,11 +8,11 @@ location(PhysicalObject, Location) :-
 %   location(PhysicalObject, Room),
 %   room(Room).
 
-top_level_container(PhysicalObject, Container) :-
-   location(PhysicalObject, C),
-   (room(C) ->
-       Container=PhysicalObject
-       ;
-       top_level_container(C, Container) ).
+%top_level_container(PhysicalObject, Container) :-
+%   location(PhysicalObject, C),
+%   (room(C) ->
+%       Container=PhysicalObject
+%       ;
+%       top_level_container(C, Container) ).
 
 

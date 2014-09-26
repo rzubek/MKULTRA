@@ -62,11 +62,18 @@ strategy(move($me, X,Y),
 strategy(achieve(docked_with(WorldObject)),
 	 goto(WorldObject)).
 strategy(goto(Object),
-	 ( let(top_level_container(Object, Place),
-	       ( assert($task/location_bids/Place:Priority),
-		 wait_event(arrived_at(Place)),
-		 retract($task/location_bids/Place)) ) )) :-
+	 ( let( Place = Object,
+	       ( 	assert($task/location_bids/Place:Priority),
+		 		wait_event(arrived_at(Place)),
+		 		retract($task/location_bids/Place)) ) )) :-
    $task/priority:Priority.
+   
+%strategy(goto(Object),
+%	 ( let(top_level_container(Object, Place),
+%	       ( assert($task/location_bids/Place:Priority),
+%		 wait_event(arrived_at(Place)),
+%		 retract($task/location_bids/Place)) ) )) :-
+%   $task/priority:Priority.
 
 %%
 %% Ingestion (eating and drinking)

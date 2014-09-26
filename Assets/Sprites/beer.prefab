@@ -10,7 +10,6 @@ GameObject:
   - 4: {fileID: 400000}
   - 212: {fileID: 21200000}
   - 114: {fileID: 11400000}
-  - 114: {fileID: 11400002}
   m_Layer: 10
   m_Name: beer
   m_TagString: Beer
@@ -50,23 +49,6 @@ MonoBehaviour:
   CommonNoun: beer
   Plural: beer
   Adjectives: []
---- !u!114 &11400002
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 100000}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 34c5496f1c8788e4b9c742e25fe97b51, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  DockingRect:
-    serializedVersion: 2
-    x: 0
-    y: -1
-    width: 1
-    height: 1
 --- !u!212 &21200000
 SpriteRenderer:
   m_ObjectHideFlags: 1

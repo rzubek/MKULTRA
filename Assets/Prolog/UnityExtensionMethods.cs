@@ -262,7 +262,7 @@ namespace Prolog
         /// </summary>
         public static bool IsProp(this GameObject o)
         {
-            return o.GetComponent<DockingRegion>() != null;
+            return !IsCharacter(o);
         }
     }
 }

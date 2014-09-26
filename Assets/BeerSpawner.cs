@@ -39,7 +39,7 @@ public class BeerSpawner : MonoBehaviour
 
         if (count < max) {
             GameObject beer = Instantiate(prefab) as GameObject;
-            beer.transform.position = new Vector3(UnityEngine.Random.Range(-2, 4), UnityEngine.Random.Range(-6, -2), 0f);
+            beer.transform.position = new Vector3(UnityEngine.Random.Range(-5, 5), UnityEngine.Random.Range(-5, 5), 0f);
         }
     }
 }

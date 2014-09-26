@@ -43,8 +43,6 @@ public class SimController : PhysicalObject
     #region Bindings to other components
 #pragma warning disable 649
 
-    [Bind(BindingScope.Global)]
-    private TileMap tileMap;
 #pragma warning restore 649
     #endregion
 
@@ -260,16 +258,6 @@ public class SimController : PhysicalObject
             // Determine if it's inside something
             if (p.Container == null)
             {
-                // It's not inside another object, so find what room it's in.
-                var n = locationRoot.ChildWithKey(o);
-                if (n == null || !n.ExclusiveKeyValue<GameObject>().GetComponent<Room>().Contains(o))
-                {
-                    foreach (var r in Registry<Room>())
-                        if (r.Contains(o))
-                        {
-                            ELNode.Store(locationRoot / o % (r.gameObject));
-                        }
-                }
             }
             else
                 ELNode.Store((this.locationRoot/o%p.Container));
@@ -407,7 +395,7 @@ public class SimController : PhysicalObject
     {
         this.UpdateLocomotionBidsAndPath();
 
-        if (CurrentlyDockedWith != null && !CurrentlyDockedWith.DockingTiles().Contains(this.transform.position))
+        if (CurrentlyDockedWith != null && CurrentlyDockedWith != CurrentDestination)
         {
             // We were docked with an object, but are not anymore.
             CurrentlyDockedWith = null;
@@ -507,7 +495,6 @@ public class SimController : PhysicalObject
     #region PhysicalObject methods
     public override void Destroy()
     {
-        tileMap.SetTileColor(gameObject.DockingTiles(), Color.red);
         base.Destroy();
     }
 
