@@ -42,14 +42,6 @@ public class SimController : PhysicalObject
 
     #region Bindings to other components
 #pragma warning disable 649
-    [Bind]
-    private CharacterSteeringController steering;
-
-    [Bind(BindingScope.GameObject, BindingDefault.Ignore)]
-    private object nlPrompt;
-
-    [Bind(BindingScope.Global, BindingDefault.Create)]
-    private PathPlanner planner;
 
     [Bind(BindingScope.Global)]
     private TileMap tileMap;
@@ -64,8 +56,6 @@ public class SimController : PhysicalObject
 
     private ELNode locationRoot;
 
-    private ELNode socialSpace;
-
     private ELNode lastDestination;
 
     private ELNode eventHistory;
@@ -79,7 +69,9 @@ public class SimController : PhysicalObject
     /// <summary>
     /// Current path being followed if the character is moving.  Null if no current locomotion goal.
     /// </summary>
-    private TilePath currentPath;
+    // private TilePath currentPath;
+    private float nextUpdate;
+    private Vector3? nextPosition;
 
     private GameObject currentDestination;
     private GameObject currentlyDockedWith;
@@ -334,9 +326,9 @@ public class SimController : PhysicalObject
         {
             switch (structure.Functor.Name)
             {
-                case "face":
-                    this.Face(structure.Argument<GameObject>(0));
-                    break;
+                //case "face":
+                //    this.Face(structure.Argument<GameObject>(0));
+                //    break;
 
                 case "cons":
                     // It's a list of actions to initiate.
@@ -407,15 +399,6 @@ public class SimController : PhysicalObject
             throw new InvalidOperationException("Unknown action: " + ISOPrologWriter.WriteToString(action));
     }
 
-    /// <summary>
-    /// Turns character to face the specified GameObject
-    /// </summary>
-    /// <param name="target">Object to face</param>
-    public void Face(GameObject target)
-    {
-        steering.Face(target.Position() - (Vector2)transform.position);
-    }
-
     #endregion
 
     #region Locomotion control
@@ -430,16 +413,21 @@ public class SimController : PhysicalObject
             CurrentlyDockedWith = null;
         }
 
-        if (this.currentPath != null)
-        {
-            // Update the steering
-            if (this.currentPath.UpdateSteering(this.steering)
-                || (Vector2.Distance(this.transform.position, currentDestination.transform.position) < 0.75
-                     && currentDestination.IsCharacter()))
-            {
-                OnPathSuccessful();
-            }
+        if (Time.time > this.nextUpdate && this.nextPosition.HasValue) {
+            this.transform.position = this.nextPosition.Value;
+            OnPathSuccessful();
         }
+
+        //if (this.currentPath != null)
+        //{
+        //    // Update the steering
+        //    if (this.currentPath.UpdateSteering(this.steering)
+        //        || (Vector2.Distance(this.transform.position, currentDestination.transform.position) < 0.75
+        //             && currentDestination.IsCharacter()))
+        //    {
+        //        OnPathSuccessful();
+        //    }
+        //}
     }
 
     private void OnPathSuccessful () {
@@ -447,9 +435,9 @@ public class SimController : PhysicalObject
         this.CurrentlyDockedWith = CurrentDestination;
         this.CurrentDestination = null;
         this.QueueEvent("arrived_at", this.CurrentlyDockedWith);
-        this.Face(CurrentlyDockedWith);
-        this.steering.Stop();
-        this.currentPath = null;
+        this.nextPosition = null;
+        this.nextUpdate = float.PositiveInfinity;
+        //this.currentPath = null;
     }
 
     readonly Dictionary<GameObject, float> bidTotals = new Dictionary<GameObject, float>();
@@ -482,7 +470,9 @@ public class SimController : PhysicalObject
                 if (newDestination)
                     ELNode.Store(eventHistory / new Structure("goto", winner)); // Log change for debugging purposes.
                 this.CurrentDestination = winner;
-                this.currentPath = planner.Plan(gameObject.TilePosition(), this.CurrentDestination.DockingTiles());
+                this.nextPosition = winner.transform.position;
+                this.nextUpdate = Time.time + UnityEngine.Random.value * 5f;
+                // this.currentPath = planner.Plan(gameObject.TilePosition(), this.CurrentDestination.DockingTiles());
             }
         }
     }

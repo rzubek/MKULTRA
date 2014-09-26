@@ -24,51 +24,6 @@ public class TilePath
     const float Speed = 50;
 
     /// <summary>
-    /// Returns a coroutine that causes *character* to follow the path stored
-    /// in this path object.
-    /// </summary>
-    /// <param name="steering">The steering controller for the character to move along the path</param>
-    /// <returns>A coroutine you can run with StartCoroutine()</returns>
-    public IEnumerator FollowPath(CharacterSteeringController steering)
-    {
-        while (this.WaypointsRemain(steering.Position))
-        {
-            steering.Seek(this.CurrentWaypoint, Speed);
-            yield return null;
-        }
-        steering.Stop();
-    }
-
-    /// <summary>
-    /// Updates the character's steering to steer along this path.
-    /// </summary>
-    /// <param name="steering">The steering controller for the character to move along the path</param>
-    /// <returns>Whether the character has arrived at the destination.</returns>
-    public bool UpdateSteering(CharacterSteeringController steering)
-    {
-        if (this.WaypointsRemain(steering.Position))
-        {
-            steering.Seek(this.CurrentWaypoint, Speed);
-            return false;
-        }
-        steering.Stop();
-        return true;
-    }
-
-    /// <summary>
-    /// True if there are further waypoints, after removing any we've already arrived at it.
-    /// </summary>
-    /// <param name="position">Our current position</param>
-    /// <returns>True if there are further waypoints after removing any we've already arrived at.</returns>
-    private bool WaypointsRemain(Vector2 position)
-    {
-        while (!IsEmpty && ArrivedAtCurrentWaypoint(position))
-            this.NextWaypoint();
-
-        return !IsEmpty;
-    }
-
-    /// <summary>
     /// True if we're already near the current waypoint.
     /// </summary>
     /// <param name="position">Our current position</param>
