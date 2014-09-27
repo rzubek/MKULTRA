@@ -76,8 +76,8 @@ exists(X) :-
 :- public existing/2.
 
 existing(Kind, Object) :-
-   is_a(Object, Kind),
-   exists(Object).
+   exists(Object),      % first, so that we don't fail the type check on non-existing objects
+   is_a(Object, Kind).
 
 :- public dead/1, alive/1.
 

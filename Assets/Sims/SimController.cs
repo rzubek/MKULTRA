@@ -70,6 +70,7 @@ public class SimController : PhysicalObject
     // private TilePath currentPath;
     private float nextUpdate;
     private Vector3? nextPosition;
+    private string nextWaitId;
 
     private GameObject currentDestination;
     private GameObject currentlyDockedWith;
@@ -252,6 +253,10 @@ public class SimController : PhysicalObject
 
     private void UpdateLocations()
     {
+        // this is super hacky but we'll have to rethink this perception system anyway
+        // so that we don't loop over all physical objects all the time
+        this.locationRoot.Clear();
+
         foreach (var p in Registry<PhysicalObject>())
         {
             var o = p.gameObject;
@@ -349,6 +354,7 @@ public class SimController : PhysicalObject
                     if (physob == null)
                         throw new NullReferenceException("Argument to ingest is not a physical object.");
                     physob.Destroy();
+                    GameObject.Destroy(physob);
                     var propinfo = patient.GetComponent<PropInfo>();
                     if (propinfo != null)
                     {
@@ -422,7 +428,9 @@ public class SimController : PhysicalObject
         // Finished the path
         this.CurrentlyDockedWith = CurrentDestination;
         this.CurrentDestination = null;
-        this.QueueEvent("arrived_at", this.CurrentlyDockedWith);
+        //this.QueueEvent("arrived_at", this.CurrentlyDockedWith.GetInstanceID());
+        this.QueueEvent("arrived_at", nextWaitId);
+        this.nextWaitId = "";
         this.nextPosition = null;
         this.nextUpdate = float.PositiveInfinity;
         //this.currentPath = null;
@@ -459,6 +467,7 @@ public class SimController : PhysicalObject
                     ELNode.Store(eventHistory / new Structure("goto", winner)); // Log change for debugging purposes.
                 this.CurrentDestination = winner;
                 this.nextPosition = winner.transform.position;
+                this.nextWaitId = winner.name;
                 this.nextUpdate = Time.time + UnityEngine.Random.value * 5f;
                 // this.currentPath = planner.Plan(gameObject.TilePosition(), this.CurrentDestination.DockingTiles());
             }
@@ -478,9 +487,11 @@ public class SimController : PhysicalObject
                 // Add its bids in
                 foreach (var bid in bids.Children)
                 {
-                    var destination = bid.Key as GameObject;
+                    var destname = bid.Key as string;
+                    var destination = GameObject.Find(destname);
                     if (destination == null)
-                        throw new Exception("Location bid is not a GameObject: "+bid.Key);
+                        // throw new Exception("Location bid is not a GameObject: "+bid.Key);
+                        continue;
                     var bidValue = Convert.ToSingle(bid.ExclusiveKeyValue<object>());
                     if (bidTotals.ContainsKey(destination))
                         bidTotals[destination] += bidValue;

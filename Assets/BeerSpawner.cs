@@ -33,12 +33,14 @@ public class BeerSpawner : MonoBehaviour
             if (c.renderer.enabled) {
                 count++;
             } else {
+                // GameObject.Destroy(c);
                 // this.StartCoroutine(Destroyer(beer));
             }
         }
 
         if (count < max) {
             GameObject beer = Instantiate(prefab) as GameObject;
+            beer.name = "BEER-" + beer.GetInstanceID();
             beer.transform.position = new Vector3(UnityEngine.Random.Range(-5, 5), UnityEngine.Random.Range(-5, 5), 0f);
         }
     }

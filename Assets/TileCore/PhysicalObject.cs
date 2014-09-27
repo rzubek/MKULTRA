@@ -37,8 +37,9 @@ public abstract class PhysicalObject : BindingBehaviour
 
     public virtual void Destroy()
     {
-        Exists = false;
+        this.Exists = false;
         this.MoveTo(GameObject.Find("DestroyedObjects"));
+        this.Container = null; // override
         this.enabled = false;
         this.renderer.enabled = false;
     }

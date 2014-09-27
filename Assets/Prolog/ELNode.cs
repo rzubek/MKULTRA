@@ -357,6 +357,10 @@ namespace Prolog
         {
             Children.RemoveAll(predicate);
         }
+
+        public void Clear () {
+            Children.Clear();
+        }
         #endregion
 
         #region Tree walk

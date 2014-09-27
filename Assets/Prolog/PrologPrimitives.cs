@@ -1940,9 +1940,15 @@ namespace Prolog
                     return CutStateSequencer.Fail();
                 return Term.UnifyAndReturnCutState(((Component)componentArg).gameObject, gameobjectArg);
             }
-            var gameObject = gameobjectArg as GameObject;
-            if (gameObject != null)
-                return EnumerateComponents(v, gameObject, type);
+
+            if (gameobjectArg is GameObject) { // this happens because Unity overrides == for destroyed but non-null objects, blarg!
+                var gameObject = gameobjectArg as GameObject;
+                if (gameObject != null)
+                    return EnumerateComponents(v, gameObject, type);
+                else
+                    return CutStateSequencer.Fail(); // game object already deleted, don't try to test it
+            }
+            
             var gov = gameobjectArg as LogicVariable;
             if (gov != null)
                 return EnumerateGameObjectsAndComponents(v, gov, type);

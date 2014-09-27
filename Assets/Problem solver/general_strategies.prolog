@@ -44,7 +44,8 @@ strategy(achieve(P),
 %%
 
 strategy(achieve(location(X,$me)),
-	 pickup(X)).
+	 pickup(X)) :-
+   exists(X).
 strategy(achieve(location(X, Room)),
 	 achieve(location(X, Container))) :-
    %\+ freestanding(X),
@@ -60,13 +61,26 @@ strategy(move($me, X,Y),
 	 achieve(location(X, Y))).
 
 strategy(achieve(docked_with(WorldObject)),
-	 goto(WorldObject)).
+	 goto(WorldObject)) :-
+   exists(WorldObject).
+
 strategy(goto(Object),
-	 ( let( Place = Object,
+	 ( let( Place = ID,
 	       ( 	assert($task/location_bids/Place:Priority),
 		 		wait_event(arrived_at(Place)),
-		 		retract($task/location_bids/Place)) ) )) :-
-   $task/priority:Priority.
+		 		retract($task/location_bids)) ) )) :-
+   $task/priority:Priority,
+   exists(Object),
+   property(Object, "name", ID).
+
+%% TEST VERSION unfortunately instance ID is pretty useless :(
+%strategy(goto(Object),
+%	 ( let( Place = ID,
+%	       ( 	assert($task/location_bids/Place:Priority),
+%		 		wait_event(arrived_at(Place), 10), % TODO: timeout is a hack for object deletion
+%		 		retract($task/location_bids/Place)) ) )) :-
+%   $task/priority:Priority,
+%   call_method(Object, getInstanceID, ID).
    
 %strategy(goto(Object),
 %	 ( let(top_level_container(Object, Place),
