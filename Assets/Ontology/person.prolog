@@ -31,15 +31,3 @@ implies_relation(likes, knows).
 implies_relation(member_of, knows_about).
 
 
-:- declare_object($'Bruce',
-		  [ age=23,
-		    given_name="Bruce",
-		    surname="Bigelow",
-		    gender=male,
-		    job=spy ],
-		  [ knows_about: spying,
-		    interested_in: cia,
-		    member_of: illuminati,
-		    friend_of: $'Kavi',
-		    roommate_of: $'Kavi',
-		    loves: $'Kavi' ]).
