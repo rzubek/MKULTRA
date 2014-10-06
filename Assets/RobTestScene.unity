@@ -338,8 +338,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   BeerPrefab: {fileID: 100000, guid: 108e4a124c1a7de4d911e95d606bde0e, type: 2}
   KaviPrefab: {fileID: 100000, guid: 27174ad68769dde4c816618c0225638e, type: 2}
-  MaxBeers: 8
-  MaxKavis: 10
+  MaxBeers: 20
+  MaxKavis: 5
 --- !u!114 &1073926159
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -365,7 +365,6 @@ GameObject:
   - 114: {fileID: 1233353667}
   - 114: {fileID: 1233353666}
   - 114: {fileID: 1233353665}
-  - 114: {fileID: 1233353664}
   m_Layer: 9
   m_Name: Bruce
   m_TagString: Bruce
@@ -385,21 +384,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 167612177}
   m_RootOrder: 1
---- !u!114 &1233353664
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 11400008, guid: e9684a2a4728ecf468032a6abc10019a,
-    type: 2}
-  m_PrefabInternal: {fileID: 744372268}
-  m_GameObject: {fileID: 1233353661}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ac71f23ec5c74af4184643b70f67aa49, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Priority: 1
-  Concerns:
-  - player_interaction
 --- !u!114 &1233353665
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -545,7 +529,6 @@ GameObject:
   - 212: {fileID: 1522824329}
   - 114: {fileID: 1522824328}
   - 114: {fileID: 1522824327}
-  - 114: {fileID: 1522824326}
   - 114: {fileID: 1522824325}
   m_Layer: 9
   m_Name: Kavi
@@ -644,20 +627,6 @@ MonoBehaviour:
     m_FixedHeight: 0
     m_StretchWidth: 1
     m_StretchHeight: 0
---- !u!114 &1522824326
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 11400006, guid: 27174ad68769dde4c816618c0225638e,
-    type: 2}
-  m_PrefabInternal: {fileID: 1678089760}
-  m_GameObject: {fileID: 1522824322}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ac71f23ec5c74af4184643b70f67aa49, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Priority: 1
-  Concerns: []
 --- !u!114 &1522824327
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -923,8 +892,6 @@ MonoBehaviour:
   - Ontology/predicate_type.csv
   - Norms/dprolog
   - Norms/dputils
-  - Norms/ethics
-  - Sims/indexicals
   - Sims/events
   - Sims/actions
   - Sims/action_selection
@@ -933,14 +900,6 @@ MonoBehaviour:
   - Problem solver/metastrategies
   - Problem solver/general_strategies
   - Concerns/concerns
-  - Concerns/event_grammar
-  - Concerns/script
-  - Concerns/patrol
-  - Concerns/be_polite
-  - Concerns/social_interaction
-  - Concerns/conversation
-  - Concerns/roles
-  - Concerns/player_interaction
   - Problem solver/everyday_life
   - Utilities/why
   - Utilities/graphviz

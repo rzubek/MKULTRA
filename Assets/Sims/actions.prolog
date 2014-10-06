@@ -82,11 +82,11 @@ precondition(ingest(Edible),
 postcondition(ingest(X),
 	      ~exists(X)).
 
-true_after(Action, Condition) :-
-   postcondition(Action, Condition).
-true_after(Action, Condition) :-
-   all(PC, postcondition(Action, PC), AllPCs),
-   follows_from(Condition, AllPCs).
+%true_after(Action, Condition) :-
+%   postcondition(Action, Condition).
+%true_after(Action, Condition) :-
+%   all(PC, postcondition(Action, PC), AllPCs),
+%   follows_from(Condition, AllPCs).
 
 follows_from( (A, B) , L) :-
    follows_from(A, L),
