@@ -4,7 +4,7 @@
 
 :- public prop/1, character/1, world_object/1, nearest/2, docked_with/1, after_time/1.
 
-:- public register_room/3, register_prop/4, register_character/3.
+:- public register_room/3, register_prop/2, register_character/3.
 
 %% register_room(*Room, *CommonNoun, *Plural)
 %  Add Room to the database, ensuring its singular and plural nouns are registered in the lexicon
@@ -15,15 +15,12 @@ register_room(Room, CommonNoun, Plural) :-
      ;
      assertz(noun(CommonNoun, Plural, X^is_a(X,CommonNoun))) ).
 
-%% register_prop(*Prop, *CommonNoun, *Plural, Adjectives)
+%% register_prop(*Prop, *CommonNoun)
 %  Add Prop to the database, ensuring its singular and plural nouns are registered in the lexicon
-register_prop(Prop, CommonNoun, Plural, Adjectives) :-
-   Predication =.. [CommonNoun, X],
-   ensure(noun(CommonNoun, Plural, X^Predication)),
+register_prop(Prop, CommonNoun) :-
    ensure(prop(Prop)),
    ensure([CommonNoun, Prop]),
    ensure(declare_kind(Prop, CommonNoun)),
-   forall(member(A, Adjectives), ensure([A, Prop])),
    forall(is_a(Prop, Kind),
 	  ignore(initialize_prop(Prop, Kind))).
 

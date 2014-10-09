@@ -26,15 +26,6 @@ public class PropInfo : PhysicalObject
     /// The word for this type of object
     /// </summary>
     public string CommonNoun;
-    /// <summary>
-    /// The plural form of the word for this type of object
-    /// </summary>
-    public string Plural;
-
-    /// <summary>
-    /// Any adjectives to attach to this object
-    /// </summary>
-    public string[] Adjectives=new string[0];
 
     public override void Awake()
     {
@@ -45,19 +36,12 @@ public class PropInfo : PhysicalObject
         if (string.IsNullOrEmpty(CommonNoun))
             CommonNoun = name.ToLower();
         CommonNoun = StringUtils.LastWordOf(CommonNoun);
-        if (string.IsNullOrEmpty(Plural) && !string.IsNullOrEmpty(CommonNoun))
-            Plural = StringUtils.PluralForm(CommonNoun);
     }
 
     public void Start()
     {
         if (!KB.Global.IsTrue("register_prop",
-                                gameObject, Symbol.Intern(CommonNoun),
-                                Symbol.Intern(Plural),
-                                // Mono can't infer the type on this, for some reason
-                                // ReSharper disable once RedundantTypeArgumentsOfMethod
-                                Prolog.Prolog.IListToPrologList(new List<Symbol>(Adjectives.Select<string,Symbol>(Symbol.Intern))))
-            )
+                                gameObject, Symbol.Intern(CommonNoun)))
             throw new Exception("Can't register prop "+name);
     }
 

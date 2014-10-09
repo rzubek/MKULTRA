@@ -258,7 +258,7 @@ namespace Prolog
         }
 
         /// <summary>
-        /// True if the object is a character.
+        /// True if the object is not a character.
         /// </summary>
         public static bool IsProp(this GameObject o)
         {

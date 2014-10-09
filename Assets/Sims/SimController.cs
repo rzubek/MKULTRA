@@ -30,7 +30,7 @@ public class SimController : PhysicalObject
     /// Should be a single word.
     /// </summary>
     public string CharacterName;
-    [Popup("woman", "man")]
+
     public string Type="woman";
     #endregion
 
@@ -40,11 +40,6 @@ public class SimController : PhysicalObject
     /// </summary>
     public bool LogActions;
 
-    #region Bindings to other components
-#pragma warning disable 649
-
-#pragma warning restore 649
-    #endregion
 
     #region Private fields
 
@@ -412,16 +407,6 @@ public class SimController : PhysicalObject
             OnPathSuccessful();
         }
 
-        //if (this.currentPath != null)
-        //{
-        //    // Update the steering
-        //    if (this.currentPath.UpdateSteering(this.steering)
-        //        || (Vector2.Distance(this.transform.position, currentDestination.transform.position) < 0.75
-        //             && currentDestination.IsCharacter()))
-        //    {
-        //        OnPathSuccessful();
-        //    }
-        //}
     }
 
     private void OnPathSuccessful () {
